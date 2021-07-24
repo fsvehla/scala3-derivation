@@ -28,21 +28,22 @@ object DeriveJsonDecoder:
         val values: Iterator[_] = x.asInstanceOf[Product].productIterator
 
         val encoded = values
-        .zip(elems)
-        .zipWithIndex
-        .toList
-        .map { case ((value, encoder), index) =>
-          names(index) -> encode0(encoder, value)
-         }
+          .zip(elems)
+          .zipWithIndex
+          .toList
+          .map { case ((value, encoder), index) =>
+            names(index) -> encode0(encoder, value)
+           }
 
-        Json.Obj(encoded)
+          Json.Obj(encoded)
       }
     }
 
   private inline def summonAll[T <: Tuple]: List[JsonEncoder[_]] =
     inline erasedValue[T] match
       case _: EmptyTuple => Nil
-      case _: (t *: ts)  => summonInline[JsonEncoder[t]] :: summonAll[ts]
+      case _: (t *: ts)  =>
+        summonInline[JsonEncoder[t]] :: summonAll[ts]
 
   private inline def getParams[T, Labels <: Tuple, Params <: Tuple]: List[String] =
     inline erasedValue[(Labels, Params)] match
